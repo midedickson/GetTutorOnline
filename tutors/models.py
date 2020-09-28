@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import UserProfile
+from parents.models import ParentProfile
 # Create your models here.
 
 
@@ -14,7 +14,7 @@ class Tutor(models.Model):
         ('INTL', 'International Passport'),
         ('DRIV', 'Drivers\' License'),
     )
-    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    profile = models.OneToOneField(ParentProfile, on_delete=models.CASCADE)
     gender = models.CharField(
         max_length=1, choices=GENDER_CHOICES, null=False, blank=False, default='M')
     age = models.CharField(max_length=2, null=False, default=20, blank=False)
@@ -41,6 +41,8 @@ class Tutor(models.Model):
     social_media_verification = models.BooleanField(default=False)
     government_id_verification = models.BooleanField(default=False)
     bank_verification = models.BooleanField(default=False)
+    slug = models.SlugField()
+    became_tutor_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.profile.title}. {self.profile.user.first_name} {self.profile.user.last_name}"
@@ -65,12 +67,15 @@ class TutoringPlan(models.Model):
     MEDIUM_CHOICES = (
         ('online', 'Online Tutoring'),
         ('physical', 'Physical Tutoring'),
-        ('both', 'Both'),
+        ('both', 'Online and Physical Tutoring'),
     )
     tutor = models.OneToOneField(Tutor, on_delete=models.CASCADE)
-    major = models.OneToOneField(Subject, on_delete=models.SET_NULL, null=True)
-    minor1 = models.OneToOneField(Subject)
-    minor2 = models.OneToOneField(Subject)
+    major = models.OneToOneField(
+        Expertise, on_delete=models.SET_NULL, null=True, related_name='major')
+    minor1 = models.OneToOneField(
+        Expertise, on_delete=models.SET_NULL, null=True, related_name='minor1')
+    minor2 = models.OneToOneField(
+        Expertise, on_delete=models.SET_NULL, null=True, related_name='minor2')
     medium = models.CharField(
         max_length=10, choices=MEDIUM_CHOICES, default='online')
     locations = models.CharField(
