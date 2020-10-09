@@ -18,7 +18,7 @@ class TutorSerializer(serializers.ModelSerializer):
 
 
 class TutoringPlanSerializer(serializers.ModelSerializer):
-    tutor = TutoringPlanSerializer(many=False, read_only=True)
+    tutor = TutorSerializer(many=False, read_only=True)
     major = StringSerializer(many=False)
     minor1 = StringSerializer(many=False)
     minor2 = StringSerializer(many=False)

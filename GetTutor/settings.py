@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'tutors',
     'accounts',
     'parents',
-    'djongo',
 ]
 
 MIDDLEWARE = [

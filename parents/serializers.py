@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import *
+from .models import TutorRequest, ParentProfile
 from accounts.serializers import UserSerilizer
+from tutors.models import TutoringPlan, Expertise
 
 
 class StringSerializer(serializers.StringRelatedField):
@@ -9,7 +10,7 @@ class StringSerializer(serializers.StringRelatedField):
 
 
 class ParentSerializer(serializers.ModelSerializer):
-    user = UserSerilizer(many=False, read_only=True)
+    user = StringSerializer(many=False)
 
     class Meta:
         model = ParentProfile
@@ -17,7 +18,9 @@ class ParentSerializer(serializers.ModelSerializer):
 
 
 class TutorRequestSerializer(serializers.ModelSerializer):
-    requested_tutorplan = StringSerializer(many=False)
+    requested_tutorplan = serializers.PrimaryKeyRelatedField(
+        many=False, queryset=TutoringPlan.objects.all())
+    subjects_requested = StringSerializer(many=True)
     requested_tutor = serializers.SerializerMethodField()
     subjects_requested = StringSerializer(many=True)
     amount_payable = serializers.SerializerMethodField()

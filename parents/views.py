@@ -25,6 +25,7 @@ class ParentCreate(generics.CreateAPIView):
 
         # Add id of currently logged user
         data['user'] = request.user.username
+        print(data)
 
         # Default behavior but pass our modified data instead
         serializer = self.get_serializer(data=data)
@@ -63,7 +64,7 @@ class TutorRequestCreate(generics.CreateAPIView):
         data = request.data.copy()
 
         # Add profile of currently logged user
-        data['requested_by'] = request.user.parentprofile_set
+        data['requested_by'] = request.user.parentprofile.id
 
         # Default behavior but pass our modified data instead
         serializer = self.get_serializer(data=data)

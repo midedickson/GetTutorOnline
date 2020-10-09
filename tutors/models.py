@@ -45,7 +45,7 @@ class Tutor(models.Model):
     became_tutor_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.profile.title}. {self.profile.user.first_name} {self.profile.user.last_name}"
+        return f"{self.profile.title} {self.profile.user.first_name} {self.profile.user.last_name}"
 
 
 class Expertise(models.Model):
@@ -84,4 +84,4 @@ class TutoringPlan(models.Model):
 
     def __str__(self):
         tutor = self.tutor.profile
-        return f"{tutor.title}. {tutor.user.first_name} {tutor.user.last_name}'s Tutoring Plan"
+        return f"{tutor.title} {tutor.user.first_name} {tutor.user.last_name}'s Tutoring Plan"

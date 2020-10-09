@@ -36,7 +36,9 @@ class RegisterSerilizer(serializers.ModelSerializer):
         else:
             user = User.objects.create_user(
                 validated_data['username'], validated_data['email'], password=validated_data['password'])
-            user.is_active = False
+            user.first_name = validated_data['first_name']
+            user.last_name = validated_data['last_name']
+            user.is_active = True
             user.save()
             '''
             uidb64 = force_bytes(urlsafe_base64_encode(user.pk))
@@ -61,5 +63,7 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(**data)
         if user and user.is_active:
             return user
-        raise serializers.ValidationError(
-            'Incorrect Username or Password!')
+        elif user and not user.is_active:
+            raise serializers.ValidationError(
+                'Please Check Your email inbox to activate your account!')
+        raise serializers.ValidationError('Incorect Username or Password!')

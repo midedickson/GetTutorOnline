@@ -23,7 +23,7 @@ class ParentProfile(models.Model):
     date_joined = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title}. {self.user.first_name} {self.user.last_name}"
+        return f"{self.title} {self.user.first_name} {self.user.last_name}"
 
 
 class TutorRequest(models.Model):
@@ -58,10 +58,13 @@ class TutorRequest(models.Model):
         price_per_day = float(self.requested_tutorplan.rate_per_hour *
                               self.hour_per_day)
         price_per_week = float(price_per_day * self.days_per_week)
-        total_price = float(price_per_week * requested_duration)
+        total_price = float(price_per_week * self.requested_duration)
         return total_price
 
     @property
     def get_tutor(self):
         tutor = self.requested_tutorplan.tutor
         return tutor
+
+    def __str__(self):
+        return f"{self.requested_tutorplan.__str__()}"
