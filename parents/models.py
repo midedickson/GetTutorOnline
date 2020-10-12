@@ -11,14 +11,15 @@ class ParentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     photo = models.ImageField(
         serialize=True, null=True, blank=True, upload_to=upload_path)
-    title = models.CharField(max_length=10)
+    title = models.CharField(max_length=10, blank=True, null=True)
     phone_number = models.CharField(
-        verbose_name='Phone Number', max_length=14)
+        verbose_name='Phone Number', max_length=14, blank=True, null=True)
     address = models.CharField(
-        max_length=200, verbose_name='Exact Address')
+        max_length=200, verbose_name='Exact Address', blank=True, null=True)
     local_govt = models.CharField(
-        max_length=20, verbose_name='Local Government')
-    state = models.CharField(max_length=20, verbose_name='State')
+        max_length=20, verbose_name='Local Government', blank=True, null=True)
+    state = models.CharField(
+        max_length=20, verbose_name='State', blank=True, null=True)
     is_tutor = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
 
@@ -45,8 +46,9 @@ class TutorRequest(models.Model):
         verbose_name='Weeks_Needed')
     location_needed = models.CharField(
         max_length=200, verbose_name='Tutoring_Location')
-    description = models.TextField(max_length=1000)
-    purpose_of_cancellation = models.TextField(max_length=1000)
+    description = models.TextField(max_length=1000, blank=True, null=True)
+    purpose_of_cancellation = models.TextField(
+        max_length=1000, blank=True, null=True)
     isAccepted = models.BooleanField(default=False)
     inProgress = models.BooleanField(default=False)
     isCompleted = models.BooleanField(default=False)

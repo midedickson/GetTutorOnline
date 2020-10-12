@@ -1,11 +1,8 @@
 {
   "folders": [
-	{
-		"path": "../GetTutored"
-	},
-	{
-		"path": "."
-	}
-],
+    {
+      "path": "."
+    }
+  ],
   "settings": {}
 }

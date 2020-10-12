@@ -1,4 +1,10 @@
-from .views import *
+from .views import (
+    ParentCreate,
+    ParentDetail,
+    TutorRequestCreate,
+    TutorRequestDetail,
+    ParentTutorRequestList
+)
 from django.urls.conf import path
 
 urlpatterns = [
@@ -8,4 +14,6 @@ urlpatterns = [
          name='create_tutor_request'),
     path('tutor_request/<pk>/', TutorRequestDetail.as_view(),
          name='get_tutor_request'),
+    path('tutor_requests/', ParentTutorRequestList.as_view(),
+         name='parent_tutor_requests')
 ]

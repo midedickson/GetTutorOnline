@@ -2,7 +2,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, permissions
-
 from .models import *
 from .serializers import *
 from .permissions import IsOwner
@@ -19,6 +18,9 @@ class ParentCreate(generics.CreateAPIView):
     queryset = ParentProfile.objects.all()
     serializer_class = ParentSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    '''
     def create(self, request, *args, **kwargs):
         # Copy parsed content from HTTP request
         data = request.data.copy()
@@ -33,6 +35,7 @@ class ParentCreate(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    '''
 
 
 class ParentDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -85,6 +88,23 @@ class TutorRequestDetail(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = TutorRequest.objects.all()
     serializer_class = TutorRequestSerializer
+
+
+class ParentTutorRequestList(generics.ListAPIView):
+    """
+        List all tutor requests from logged in parent.
+    """
+
+    def get_queryset(self):
+        profile = self.request.user.parentprofile
+        queryset = super(ParentTutorRequestList, self).get_queryset()
+        queryset = TutorRequest.objects.filter(requested_by=profile)
+        return queryset
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+    serializer_class = TutorRequestSerializer
+
 
 # class SpecialRequestCreate(generics.CreateAPIView):
 #     """

@@ -7,6 +7,7 @@ from django.db.models import Q, Count
 from .models import Tutor, Expertise, TutoringPlan
 from .serializers import TutorSerializer, TutoringPlanSerializer
 from .permissions import IsOwnerOrReadOnly
+from parents.serializers import TutorRequestSerializer
 
 
 def is_valid_queryparam(param):
@@ -67,6 +68,9 @@ class TutorCreate(generics.CreateAPIView):
     queryset = Tutor.objects.all()
     serializer_class = TutorSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(profile=self.request.user.parentprofile)
+    '''
     def create(self, request, *args, **kwargs):
         # Copy parsed content from HTTP request
         data = request.data.copy()
@@ -79,6 +83,7 @@ class TutorCreate(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    '''
 
 
 class TutorDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -92,6 +97,24 @@ class TutorDetail(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Tutor.objects.all()
     serializer_class = TutorSerializer
+
+
+class TuTutorRequestList(generics.ListAPIView):
+    """
+        List all tutor requests from logged in tutor.
+    """
+
+    def get_queryset(self):
+        tutoringplan = self.request.user.parentprofile.tutor.tutoringplan
+        queryset = super(ParentTutorRequestList, self).get_queryset()
+        queryset = TutorRequest.objects.filter(
+            requested_tutorplan=tutoringplan)
+        return queryset
+
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+    serializer_class = TutorRequestSerializer
 
 
 """
