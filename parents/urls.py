@@ -3,7 +3,8 @@ from .views import (
     ParentDetail,
     TutorRequestCreate,
     TutorRequestDetail,
-    ParentTutorRequestList
+    ParentTutorRequestList,
+    TutoringPlanDetailView
 )
 from django.urls.conf import path
 

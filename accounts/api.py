@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 import json
 import sys
 import traceback
-from django.http import HttpResponse
 
 # Register API
 
@@ -41,9 +40,7 @@ def user_signup_view(request):
         try:
             check_username = User.objects.get(username=username)
             if check_username:
-                response = json.dumps(
-                    {'message': 'A user with that username already exists'})
-                return HttpResponse(response, content_type='text/json', status=400)
+                return Response({'message': 'A user with that username already exists'}, status=400)
         except User.DoesNotExist:
             pass
         try:
@@ -68,15 +65,12 @@ def user_signup_view(request):
             # Enter the email
 
             if not check(email):
-                response = json.dumps(
-                    {'message': 'Please Enter a valid email'})
-                return HttpResponse(response, content_type='text/json', status=400)
+                return Response({'message': 'Please Enter a valid email'}, status=400)
 
             if check_email:
-                response = json.dumps({
+                return Response({
                     'message': 'It seems you have previuosly signed up on our Get Tutor. Login to continue or Check that you are using the correct email.'
-                })
-                return HttpResponse(response, content_type='text/json', status=400)
+                }, status=400)
         except User.DoesNotExist:
             pass
         # elif check_email and not check_email.active:
@@ -84,7 +78,7 @@ def user_signup_view(request):
         #     # if generate_token.check_token(check_user, token_validity_check):
         #     response = json.dumps(
         #         [{'message': 'Email already registered. Please check your email for activation link'}])
-        #     return HttpResponse(response, content_type='text/json', status=400)
+        #     return Response(response, content_type='text/json', status=400)
         if password == password2:
             user = User.objects.create_user(
                 username=username, email=email, password=password)
@@ -92,13 +86,11 @@ def user_signup_view(request):
             user.last_name = last_name
             user.active = True
             user.save()
-            response = json.dumps({
+            # response = json.dumps([{ 'message': 'Check your email for account activation link. It may take several minutes to arrive'}])
+            return Response({
                 'token': AuthToken.objects.create(user)[1],
                 'message': 'Sign up successful',
-            })
-
-            # response = json.dumps([{ 'message': 'Check your email for account activation link. It may take several minutes to arrive'}])
-            return HttpResponse(response, content_type='text/json', status=200)
+            }, status=200)
             # user.type = User.Types.CLARITYCOUNSELLOR
             # user_token = generate_token.make_token(user)
             # user.token_time_stamp = user_token
@@ -136,10 +128,9 @@ def user_signup_view(request):
             #     # print(ex_value)
             #     # print(ex_traceback)
             #     response = json.dumps([{'message': 'Error in signing up'}])
-            #     return HttpResponse(response, content_type='text/json', status=500)
+            #     return Response(response, content_type='text/json', status=500)
         else:
-            response = json.dumps({'message': 'Passwords must match'})
-            return HttpResponse(response, content_type='text/json', status=400)
+            return Response({'message': 'Passwords must match'}, status=400)
 
     except BaseException as e:
         ex_type, ex_value, ex_traceback = sys.exc_info()
@@ -147,9 +138,7 @@ def user_signup_view(request):
         print(ex_type)
         print(ex_value)
         print(ex_traceback)
-        response = json.dumps(
-            [{'message': 'Something went wrong. Please try again.'}])
-        return HttpResponse(response, content_type='text/json', status=500)
+        return Response({'message': 'Something went wrong. Please try again.'}, status=500)
 
 # Login API
 

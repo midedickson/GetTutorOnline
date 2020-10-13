@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from .models import *
+from .models import (
+    Tutor,
+    TutoringPlan,
+    Expertise
+)
 # from parents.serializers import ParentSerializer
 from parents.serializers import ParentSerializer
 
@@ -26,3 +30,14 @@ class TutoringPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = TutoringPlan
         fields = '__all__'
+
+
+class ExpertiseSerializer(serializers.ModelSerializer):
+    display_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Expertise
+        fields = '__all__'
+
+    def get_display_name(self, obj):
+        return obj.__str__()
