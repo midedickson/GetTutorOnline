@@ -5,6 +5,7 @@ from rest_framework import generics, permissions
 from .models import *
 from .serializers import *
 from .permissions import IsOwner
+from django.shortcuts import get_object_or_404
 
 
 class ParentCreate(generics.CreateAPIView):
@@ -48,6 +49,12 @@ class ParentDetail(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = ParentProfile.objects.all()
     serializer_class = ParentSerializer
+
+    def get_object(self):
+        username = self.request.user
+        user = get_object_or_404(User, username=username)
+        profile = get_object_or_404(ParentProfile, user=user)
+        return profile
 
 
 class TutorRequestCreate(generics.CreateAPIView):
@@ -94,16 +101,15 @@ class ParentTutorRequestList(generics.ListAPIView):
     """
         List all tutor requests from logged in parent.
     """
-
-    def get_queryset(self):
-        profile = self.request.user.parentprofile
-        queryset = super(ParentTutorRequestList, self).get_queryset()
-        queryset = TutorRequest.objects.filter(requested_by=profile)
-        return queryset
     permission_classes = [
         permissions.IsAuthenticated
     ]
     serializer_class = TutorRequestSerializer
+
+    def get_queryset(self):
+        profile = self.request.user.parentprofile
+        queryset = TutorRequest.objects.filter(requested_by=profile)
+        return queryset
 
 
 # class SpecialRequestCreate(generics.CreateAPIView):

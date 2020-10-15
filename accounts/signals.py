@@ -5,15 +5,19 @@ from parents.models import ParentProfile
 from tutors.models import Tutor
 
 
-@receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     if created:
         ParentProfile.objects.create(user=instance)
-        instance.parentprofile_set.save()
+        instance.parentprofile.save()
 
 
-@receiver(post_save, sender=Tutor)
+post_save.connect(create_profile, sender=User)
+
+
 def allow_user_become_tutor(sender, instance, created, **kwargs):
     if created:
         instance.profile.is_tutor = True
         instance.profile.save()
+
+
+post_save.connect(allow_user_become_tutor, sender=Tutor)

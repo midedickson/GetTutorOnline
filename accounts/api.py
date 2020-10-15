@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 import json
 import sys
 import traceback
+from parents.models import ParentProfile
 
 # Register API
 
@@ -86,6 +87,7 @@ def user_signup_view(request):
             user.last_name = last_name
             user.active = True
             user.save()
+            ParentProfile.objects.create(user=user)
             # response = json.dumps([{ 'message': 'Check your email for account activation link. It may take several minutes to arrive'}])
             return Response({
                 'token': AuthToken.objects.create(user)[1],
