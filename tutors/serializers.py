@@ -21,17 +21,6 @@ class TutorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TutoringPlanSerializer(serializers.ModelSerializer):
-    tutor = TutorSerializer(many=False, read_only=True)
-    major = StringSerializer(many=False)
-    minor1 = StringSerializer(many=False)
-    minor2 = StringSerializer(many=False)
-
-    class Meta:
-        model = TutoringPlan
-        fields = '__all__'
-
-
 class ExpertiseSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()
 
@@ -41,3 +30,14 @@ class ExpertiseSerializer(serializers.ModelSerializer):
 
     def get_display_name(self, obj):
         return obj.__str__()
+
+
+class TutoringPlanSerializer(serializers.ModelSerializer):
+    tutor = TutorSerializer(many=False, read_only=True)
+    major = ExpertiseSerializer(many=False)
+    minor1 = ExpertiseSerializer(many=False)
+    minor2 = ExpertiseSerializer(many=False)
+
+    class Meta:
+        model = TutoringPlan
+        fields = '__all__'

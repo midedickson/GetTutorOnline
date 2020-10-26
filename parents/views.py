@@ -21,22 +21,6 @@ class ParentCreate(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-    '''
-    def create(self, request, *args, **kwargs):
-        # Copy parsed content from HTTP request
-        data = request.data.copy()
-
-        # Add id of currently logged user
-        data['user'] = request.user.username
-        print(data)
-
-        # Default behavior but pass our modified data instead
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    '''
 
 
 class ParentDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -51,9 +35,7 @@ class ParentDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ParentSerializer
 
     def get_object(self):
-        username = self.request.user
-        user = get_object_or_404(User, username=username)
-        profile = get_object_or_404(ParentProfile, user=user)
+        profile = get_object_or_404(ParentProfile, user=self.request.user)
         return profile
 
 
@@ -69,6 +51,10 @@ class TutorRequestCreate(generics.CreateAPIView):
     queryset = TutorRequest.objects.all()
     serializer_class = TutorRequestSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    '''
     def create(self, request, *args, **kwargs):
         # Copy parsed content from HTTP request
         data = request.data.copy()
@@ -82,6 +68,7 @@ class TutorRequestCreate(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    '''
 
 
 class TutorRequestDetail(generics.RetrieveUpdateDestroyAPIView):

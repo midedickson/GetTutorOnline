@@ -3,6 +3,12 @@ from django.contrib.auth.models import User
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from accounts.utils import token_generator
+from django.contrib.auth import (
+    authenticate,
+    login,
+    logout
+)
+
 # Create your views here.
 
 

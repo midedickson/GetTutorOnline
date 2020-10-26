@@ -16,32 +16,32 @@ class Tutor(models.Model):
     )
     profile = models.OneToOneField(ParentProfile, on_delete=models.CASCADE)
     gender = models.CharField(
-        max_length=1, choices=GENDER_CHOICES, null=False, blank=False, default='M')
-    age = models.CharField(max_length=2, null=False, default=20, blank=False)
-    dob = models.DateField()
-    disabilities = models.CharField(max_length=150, default='None', null=False)
-    nce = models.CharField(max_length=100, default='None',
-                           null=False, blank=True, verbose_name='College of Education')
+        max_length=1, choices=GENDER_CHOICES, null=True, blank=True, default='M')
+    age = models.CharField(max_length=2, null=True, blank=True)
+    disabilities = models.CharField(
+        max_length=150, default='None', null=True, blank=True)
+    nce = models.CharField(max_length=100, null=True, default='None',
+                           blank=True, verbose_name='College of Education')
     bachelors = models.CharField(
-        max_length=200, default='None', null=False, blank=True, verbose_name='Bachelors')
-    post_grad = models.CharField(max_length=100, default='None',
-                                 null=False, blank=True, verbose_name='Post Graduate Studies')
+        max_length=200, default='None', null=True, blank=True, verbose_name='Bachelors')
+    post_grad = models.CharField(
+        max_length=100, null=True, default='None', blank=True, verbose_name='Post Graduate Studies')
     masters = models.CharField(
-        max_length=200, default='None', null=False, blank=True, verbose_name='Masters')
-    phd = models.CharField(max_length=100, default='None', null=False,
+        max_length=200, default='None', null=True, blank=True, verbose_name='Masters')
+    phd = models.CharField(max_length=100, default='None', null=True,
                            blank=True, verbose_name='Doctor of Philosophy(PhD)')
     government_id_type = models.CharField(
-        choices=ID_CHOICES, max_length=4, null=False, blank=False)
-    government_id_number = models.PositiveIntegerField()
-    yrs_of_experience = models.PositiveIntegerField()
-    description = models.TextField(max_length=500)
+        choices=ID_CHOICES, max_length=4, null=True, blank=True)
+    government_id_number = models.PositiveIntegerField(null=True, blank=True)
+    yrs_of_experience = models.PositiveIntegerField(null=True, blank=True)
+    description = models.TextField(max_length=500, null=True, blank=True)
     facebook = models.CharField(max_length=100, null=True, blank=True)
     bank_name = models.CharField(max_length=100, null=True, blank=True)
-    bank_account_number = models.PositiveIntegerField()
+    bank_account_number = models.PositiveIntegerField(null=True, blank=True)
+    bvn = models.PositiveIntegerField(null=True, blank=True)
     social_media_verification = models.BooleanField(default=False)
     government_id_verification = models.BooleanField(default=False)
     bank_verification = models.BooleanField(default=False)
-    slug = models.SlugField()
     became_tutor_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

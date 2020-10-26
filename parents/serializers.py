@@ -10,7 +10,7 @@ class StringSerializer(serializers.StringRelatedField):
 
 
 class ParentSerializer(serializers.ModelSerializer):
-    user = StringSerializer(many=False)
+    user = UserSerilizer(many=False, read_only=True)
 
     class Meta:
         model = ParentProfile

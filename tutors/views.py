@@ -10,8 +10,8 @@ from rest_framework.permissions import AllowAny
 from parents.models import ParentProfile
 from .models import Tutor, Expertise, TutoringPlan
 from .serializers import TutorSerializer, TutoringPlanSerializer, ExpertiseSerializer
-from .permissions import IsOwnerOrReadOnly
-from parents.serializers import TutorRequestSerializer
+from .permissions import IsOwnerOrReadOnly, IsTutorOrReadOnly, IsTutorOwnerOrReadOnly
+from parents.serializers import TutorRequestSerializer, ParentSerializer
 
 
 def is_valid_queryparam(param):
@@ -29,16 +29,16 @@ def tutor_filter(request):
     grade = request.GET.get('grade')
 
     if is_valid_queryparam(min_rate):
-        tutor_qs = tutor_qs.filter(tutorplan_set__rate_per_hour__gte=min_rate)
+        tutor_qs = tutor_qs.filter(tutorplan__rate_per_hour__gte=min_rate)
 
     if is_valid_queryparam(max_rate):
-        tutor_qs = tutor_qs.filter(tutorplan_set__rate_per_hour__lte=max_rate)
+        tutor_qs = tutor_qs.filter(tutorplan__rate_per_hour__lte=max_rate)
 
     if is_valid_queryparam(expertise) and expertise != 'Choose...':
-        tutor_qs = tutor_qs.filter(tutorplan_set__expertise__name=expertise)
+        tutor_qs = tutor_qs.filter(tutorplan__expertise__name=expertise)
 
     if is_valid_queryparam(grade) and grade != 'Choose...':
-        tutor_qs = tutor_qs.filter(tutorplan_set__expertise__grade=grade)
+        tutor_qs = tutor_qs.filter(tutorplan__expertise__grade=grade)
 
     if is_valid_queryparam(name_contains_query):
         tutor_qs = tutor_qs.filter(Q(profile__user__first_name__icontains=name_contains_query) | Q(
@@ -61,6 +61,25 @@ class TutorList(generics.ListAPIView):
         return qs
 
 
+class TutorProfile(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a parent.
+    """
+    permission_classes = [
+        IsOwnerOrReadOnly,
+    ]
+
+    queryset = ParentProfile.objects.all()
+    serializer_class = ParentSerializer
+
+    def get_object(self):
+        profile = get_object_or_404(ParentProfile, user=self.request.user)
+        return profile
+
+    def perform_update(self, serializer):
+        instance = serializer.save(is_tutor=True)
+
+
 class TutorCreate(generics.CreateAPIView):
     """
     Create a new tutor.
@@ -73,21 +92,10 @@ class TutorCreate(generics.CreateAPIView):
     serializer_class = TutorSerializer
 
     def perform_create(self, serializer):
-        serializer.save(profile=self.request.user.parentprofile)
-    '''
-    def create(self, request, *args, **kwargs):
-        # Copy parsed content from HTTP request
-        data = request.data.copy()
-
-        # Add id of currently logged user
-        data['profile'] = request.user.parentprofile_set
-        # Default behavior but pass our modified data instead
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    '''
+        profile = get_object_or_404(ParentProfile, user=self.request.user)
+        profile.is_tutor = True
+        profile.save()
+        serializer.save(profile=profile)
 
 
 class TutorDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -95,18 +103,66 @@ class TutorDetail(generics.RetrieveUpdateDestroyAPIView):
     Retrieve, update or delete a tutor.
     """
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        permissions.IsAuthenticatedOrReadOnly, IsTutorOrReadOnly,
     ]
 
     queryset = Tutor.objects.all()
     serializer_class = TutorSerializer
 
     def get_object(self):
-        username = self.request.query_params.get('username', None)
+        username = self.request.GET.get('username', None)
         user = get_object_or_404(User, username=username)
         profile = get_object_or_404(ParentProfile, user=user)
         tutor = get_object_or_404(Tutor, profile=profile)
         return tutor
+
+    # def perform_update(self, serializer):
+    #     instance = serializer.save(is_tutor=True)
+
+
+class CreateTutorPLan(generics.CreateAPIView):
+
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    queryset = TutoringPlan.objects.all()
+    serializer_class = TutoringPlanSerializer
+
+    def perform_create(self, serializer):
+        profile = get_object_or_404(ParentProfile, user=self.request.user)
+        serializer.save(tutor=profile.tutor)
+
+
+class TutoringPlanDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated, IsTutorOwnerOrReadOnly
+    ]
+
+    serializer_class = TutoringPlanSerializer
+    queryset = TutoringPlan.objects.all()
+
+    def get_object(self):
+        username = self.request.GET.get('username', None)
+        user = get_object_or_404(User, username=username)
+        profile = get_object_or_404(ParentProfile, user=user)
+        tutor = get_object_or_404(Tutor, profile=profile)
+        tutor_plan = get_object_or_404(TutoringPlan, tutor=tutor)
+        return tutor_plan
+
+
+class TutorsTutorPlanList(generics.ListAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = TutoringPlanSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        profile = get_object_or_404(ParentProfile, user=user)
+        tutor = get_object_or_404(Tutor, profile=profile)
+        qs = TutoringPlan.objects.filter(tutor=tutor)
 
 
 class TuTutorRequestList(generics.ListAPIView):
@@ -116,7 +172,6 @@ class TuTutorRequestList(generics.ListAPIView):
 
     def get_queryset(self):
         tutoringplan = self.request.user.parentprofile.tutor.tutoringplan
-        queryset = super(ParentTutorRequestList, self).get_queryset()
         queryset = TutorRequest.objects.filter(
             requested_tutorplan=tutoringplan)
         return queryset
@@ -165,35 +220,20 @@ class GeneralTutoringPlanList(generics.ListAPIView):
         return qs
 
 
-class TutorsTutoringPlan(generics.ListAPIView):
-    pass
-
-
-class TutoringPlanDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [
-        permissions.IsAuthenticated,
-    ]
-
-    serializer_class = TutoringPlanSerializer
-    queryset = TutoringPlan.objects.all()
-
-    def get_object(self):
-        username = self.request.query_params.get('username', None)
-        user = get_object_or_404(User, username=username)
-        profile = get_object_or_404(ParentProfile, user=user)
-        tutor = get_object_or_404(Tutor, profile=profile)
-        tutor_plan = get_object_or_404(TutoringPlan)
-        return tutor_plan
-
-
 class ExpertiseListView(generics.ListAPIView):
     permission_classes = [
-        permissions.IsAuthenticated,
+        permissions.AllowAny,
     ]
 
     serializer_class = ExpertiseSerializer
 
-    queryset = Expertise.objects.all()
+    def get_queryset(self):
+        grade = self.request.GET.get('grade')
+
+        if grade:
+            return Expertise.objects.filter(grade__iexact=grade)
+
+        return Expertise.objects.all()
 
 
 """
