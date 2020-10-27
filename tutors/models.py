@@ -70,11 +70,11 @@ class TutoringPlan(models.Model):
         ('both', 'Online and Physical Tutoring'),
     )
     tutor = models.OneToOneField(Tutor, on_delete=models.CASCADE)
-    major = models.OneToOneField(
+    major = models.ForeignKey(
         Expertise, on_delete=models.SET_NULL, null=True, related_name='major')
-    minor1 = models.OneToOneField(
+    minor1 = models.ForeignKey(
         Expertise, on_delete=models.SET_NULL, null=True, related_name='minor1')
-    minor2 = models.OneToOneField(
+    minor2 = models.ForeignKey(
         Expertise, on_delete=models.SET_NULL, null=True, related_name='minor2')
     medium = models.CharField(
         max_length=10, choices=MEDIUM_CHOICES, default='online')

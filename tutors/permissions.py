@@ -44,3 +44,13 @@ class IsTutorOwnerOrReadOnly(permissions.BasePermission):
 
         # Write permissions are only allowed to the owner of the snippet.
         return obj.tutor.profile.user == request.user
+
+
+class IsTutor(permissions.BasePermission):
+    """
+    Custom permission to only allow owners of an object to edit it.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Allowing only tutors to access certain views
+        return request.user.parentprofile.is_tutor

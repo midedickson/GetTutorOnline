@@ -5,13 +5,17 @@ from rest_framework import generics, permissions
 from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from parents.models import ParentProfile
 from .models import Tutor, Expertise, TutoringPlan
 from .serializers import TutorSerializer, TutoringPlanSerializer, ExpertiseSerializer
-from .permissions import IsOwnerOrReadOnly, IsTutorOrReadOnly, IsTutorOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsTutorOrReadOnly, IsTutorOwnerOrReadOnly, IsTutor
 from parents.serializers import TutorRequestSerializer, ParentSerializer
+import json
+import sys
+import traceback
 
 
 def is_valid_queryparam(param):
@@ -118,6 +122,46 @@ class TutorDetail(generics.RetrieveUpdateDestroyAPIView):
 
     # def perform_update(self, serializer):
     #     instance = serializer.save(is_tutor=True)
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated, IsTutor])
+def create_tutor_plan(request):
+    # request data
+    payload = json.loads(request.body)
+    major_id = payload['major']
+    minor1_id = payload['minor1']
+    minor2_id = payload['minor2']
+    medium = payload['medium']
+    locations = payload['locations']
+    rate_per_hour = payload['rate_per_hour']
+    try:
+        # get objects
+        major = get_object_or_404(Expertise, id=major_id)
+        minor1 = get_object_or_404(Expertise, id=minor1_id)
+        minor2 = get_object_or_404(Expertise, id=minor2_id)
+        profile = get_object_or_404(ParentProfile, user=request.user)
+        tutor = get_object_or_404(Tutor, profile=profile)
+
+        tutorplan = TutoringPlan.objects.create(
+            tutor=tutor,
+            major=major,
+            minor1=minor1,
+            minor2=minor2,
+            locations=locations,
+            rate_per_hour=rate_per_hour
+        )
+
+        return Response({'message': 'Tutoring Plan succesfully Created!'})
+
+    except BaseException as e:
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        ex_traceback = traceback.extract_tb(ex_traceback)
+        print(ex_type)
+        print(ex_value)
+        print(ex_traceback)
+        return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
 
 
 class CreateTutorPLan(generics.CreateAPIView):

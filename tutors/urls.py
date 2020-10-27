@@ -9,7 +9,8 @@ from .views import (
     GeneralTutoringPlanList,
     CreateTutorPLan,
     TutorsTutorPlanList,
-    TutorProfile
+    TutorProfile,
+    create_tutor_plan
 )
 
 from parents.views import (ParentDetail)
@@ -21,7 +22,7 @@ urlpatterns = [
     path('create/', TutorCreate.as_view(), name='tutor_create'),
     path('profile/', TutorProfile.as_view(), name='update-profile'),
     path('info/', TutorDetail.as_view(), name='tutor_detail'),
-    path('create_tutor_plan/', CreateTutorPLan.as_view()),
+    path('create_tutor_plan/', create_tutor_plan),
     path('tutor_request_list/', TuTutorRequestList.as_view(),
          name='tutor_request_for_tutoring plan'),
     path('expertise', ExpertiseListView.as_view(), name='expertise'),
