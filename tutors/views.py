@@ -252,7 +252,7 @@ def tutorplan_filter(request):
         tutorplan_qs = tutorplan_qs.filter(Q(tutor__profile__user__first_name__icontains=name_contains_query) | Q(
             tutor__profile__user__last_name__icontains=name_contains_query))
 
-    return tutorplan_qs
+    return tutorplan_qs.order_by('?')
 
 
 class GeneralTutoringPlanList(generics.ListAPIView):
