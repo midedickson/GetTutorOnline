@@ -1,3 +1,5 @@
+from rest_framework.pagination import PageNumberPagination
+import math
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -242,10 +244,10 @@ def tutorplan_filter(request):
     if is_valid_queryparam(max_rate):
         tutorplan_qs = tutorplan_qs.filter(rate_per_hour__lte=max_rate)
 
-    if is_valid_queryparam(expertise and expertise != 'Choose...'):
+    if is_valid_queryparam(expertise) and expertise != 'Choose...':
         tutorplan_qs = tutorplan_qs.filter(expertise__name=expertise)
 
-    if is_valid_queryparam(grade and grade != 'Choose...'):
+    if is_valid_queryparam(grade) and grade != 'Choose...':
         tutorplan_qs = tutorplan_qs.filter(expertise__grade=grade)
 
     if is_valid_queryparam(name_contains_query):
@@ -255,9 +257,29 @@ def tutorplan_filter(request):
     return tutorplan_qs.order_by('?')
 
 
+DEFAULT_PAGE = 1
+DEFAULT_PAGE_SIZE = 1
+
+
+class TutorListPagination(PageNumberPagination):
+    page = DEFAULT_PAGE
+    page_size = DEFAULT_PAGE_SIZE
+    page_size_query_param = 'page_size'
+
+    def get_paginated_response(self, data):
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'total_pages': math.ceil(self.page.paginator.count/DEFAULT_PAGE_SIZE),
+            'page': int(self.request.GET.get('page', DEFAULT_PAGE)),
+            'results': data
+        })
+
+
 class GeneralTutoringPlanList(generics.ListAPIView):
     permission_classes = [AllowAny, ]
     serializer_class = TutoringPlanSerializer
+    pagination_class = TutorListPagination
 
     def get_queryset(self):
         qs = tutorplan_filter(self.request)

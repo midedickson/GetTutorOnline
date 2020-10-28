@@ -22,7 +22,6 @@ class TutorRequestSerializer(serializers.ModelSerializer):
         many=False, queryset=TutoringPlan.objects.all())
     subjects_requested = StringSerializer(many=True)
     requested_tutor = serializers.SerializerMethodField()
-    subjects_requested = StringSerializer(many=True)
     amount_payable = serializers.SerializerMethodField()
 
     class Meta:

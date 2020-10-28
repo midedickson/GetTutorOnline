@@ -47,13 +47,14 @@ class TutorRequest(models.Model):
     location_needed = models.CharField(
         max_length=200, verbose_name='Tutoring_Location')
     description = models.TextField(max_length=1000, blank=True, null=True)
-    purpose_of_cancellation = models.TextField(
+    purpose_of_dispute = models.TextField(
         max_length=1000, blank=True, null=True)
     isAccepted = models.BooleanField(default=False)
     inProgress = models.BooleanField(default=False)
     isCompleted = models.BooleanField(default=False)
     isCancelled = models.BooleanField(default=False)
     isPaid = models.BooleanField(default=False)
+    inDispute = models.BooleanField(default=False)
 
     @property
     def get_total_price(self):

@@ -52,7 +52,8 @@ class TutorRequestCreate(generics.CreateAPIView):
     serializer_class = TutorRequestSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        profile = ParentProfile.objects.get(user=self.request.user)
+        serializer.save(requested_by=profile)
 
     '''
     def create(self, request, *args, **kwargs):
