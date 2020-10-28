@@ -34,10 +34,21 @@ class ExpertiseSerializer(serializers.ModelSerializer):
 
 class TutoringPlanSerializer(serializers.ModelSerializer):
     tutor = TutorSerializer(many=False, read_only=True)
-    major = ExpertiseSerializer(many=False)
-    minor1 = ExpertiseSerializer(many=False)
-    minor2 = ExpertiseSerializer(many=False)
+    major_expertise = serializers.SerializerMethodField(read_only=True)
+    minor1_expertise = serializers.SerializerMethodField(read_only=True)
+    minor2_expertise = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = TutoringPlan
         fields = '__all__'
+
+    def get_major_expertise(self, obj):
+        return ExpertiseSerializer(obj.major, many=False).data
+
+    def get_minor1_expertise(self, obj):
+        return ExpertiseSerializer(obj.minor1, many=False).data
+
+        return obj.major1
+
+    def get_minor2_expertise(self, obj):
+        return ExpertiseSerializer(obj.minor2, many=False).data

@@ -227,7 +227,7 @@ class TuTutorRequestList(generics.ListAPIView):
 
 
 def tutorplan_filter(request):
-    tutorplan_qs = TutorPlan.objects.all()
+    tutorplan_qs = TutoringPlan.objects.all()
     # Parameters to be sent to the backend
     name_contains_query = request.GET.get('name_contains')
     min_rate = request.GET.get('min_rate')

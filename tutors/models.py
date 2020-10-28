@@ -80,7 +80,7 @@ class TutoringPlan(models.Model):
         max_length=10, choices=MEDIUM_CHOICES, default='online')
     locations = models.CharField(
         max_length=200, null=False, blank=False, default='Any Location...')
-    rate_per_hour = models.PositiveIntegerField()
+    rate_per_hour = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         tutor = self.tutor.profile
