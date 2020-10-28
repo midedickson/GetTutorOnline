@@ -54,3 +54,9 @@ class IsTutor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         # Allowing only tutors to access certain views
         return request.user.parentprofile.is_tutor
+
+
+class IsRequestedTutor(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        tutor = obj.get_tutor
+        return tutor.profile.user == request.user

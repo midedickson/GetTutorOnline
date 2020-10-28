@@ -1,10 +1,11 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework import generics, permissions
 from .models import *
 from .serializers import *
-from .permissions import IsOwner
+from .permissions import IsOwner, IsRequester
 from django.shortcuts import get_object_or_404
 
 
@@ -54,22 +55,6 @@ class TutorRequestCreate(generics.CreateAPIView):
     def perform_create(self, serializer):
         profile = ParentProfile.objects.get(user=self.request.user)
         serializer.save(requested_by=profile)
-
-    '''
-    def create(self, request, *args, **kwargs):
-        # Copy parsed content from HTTP request
-        data = request.data.copy()
-
-        # Add profile of currently logged user
-        data['requested_by'] = request.user.parentprofile.id
-
-        # Default behavior but pass our modified data instead
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    '''
 
 
 class TutorRequestDetail(generics.RetrieveDestroyAPIView):

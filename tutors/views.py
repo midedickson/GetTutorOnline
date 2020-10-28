@@ -10,14 +10,61 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from parents.models import ParentProfile
+from parents.models import ParentProfile, TutorRequest
 from .models import Tutor, Expertise, TutoringPlan
 from .serializers import TutorSerializer, TutoringPlanSerializer, ExpertiseSerializer
-from .permissions import IsOwnerOrReadOnly, IsTutorOrReadOnly, IsTutorOwnerOrReadOnly, IsTutor
+from .permissions import (
+    IsOwnerOrReadOnly,
+    IsTutorOrReadOnly,
+    IsTutorOwnerOrReadOnly,
+    IsTutor,
+    IsRequestedTutor
+
+)
 from parents.serializers import TutorRequestSerializer, ParentSerializer
 import json
 import sys
 import traceback
+
+
+@api_view(["GET"])
+@permission_classes([IsRequestedTutor, ])
+def accept_tutor_request(request, pk):
+    user = request.user
+    profile = ParentProfile.objects.get(user=user)
+    tutor = Tutor.objects.get(profile=profile)
+    try:
+        tutor_request = TutorRequest.objects.get(id=pk)
+        tutor_request.isAccepted = True
+        tutor_request.save()
+        return Response({'message': 'Well Done, You have succefully accepted this request, your will be connected with the Parent as soon as the payments have been completed'})
+    except BaseException as e:
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        ex_traceback = traceback.extract_tb(ex_traceback)
+        print(ex_type)
+        print(ex_value)
+        print(ex_traceback)
+        return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
+
+
+@api_view(["GET"])
+@permission_classes([IsRequestedTutor, ])
+def reject_tutor_request(request, pk):
+    user = request.user
+    profile = ParentProfile.objects.get(user=user)
+    tutor = Tutor.objects.get(profile=profile)
+    try:
+        tutor_request = TutorRequest.objects.get(id=pk)
+        tutor_request.isRejected = True
+        tutor_request.save()
+        return Response({'message': 'You have rejected this request, this will be communicated to the Parent!'})
+    except BaseException as e:
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        ex_traceback = traceback.extract_tb(ex_traceback)
+        print(ex_type)
+        print(ex_value)
+        print(ex_traceback)
+        return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
 
 
 def is_valid_queryparam(param):

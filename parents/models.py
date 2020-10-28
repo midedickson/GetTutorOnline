@@ -49,7 +49,10 @@ class TutorRequest(models.Model):
     description = models.TextField(max_length=1000, blank=True, null=True)
     purpose_of_dispute = models.TextField(
         max_length=1000, blank=True, null=True)
+    purpose_of_rejection = models.TextField(
+        max_length=1000, blank=True, null=True)
     isAccepted = models.BooleanField(default=False)
+    isRejected = models.BooleanField(default=False)
     inProgress = models.BooleanField(default=False)
     isCompleted = models.BooleanField(default=False)
     isCancelled = models.BooleanField(default=False)

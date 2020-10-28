@@ -15,3 +15,12 @@ class IsOwner(permissions.BasePermission):
 
         # Write permissions are only allowed to the owner of the snippet.
         return obj.user == request.user
+
+
+class IsRequester(permissions.BasePermission):
+    """
+    Custom Permissions to allow only the parent that booked a request to edit the request
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return obj.requested_by.user == request.user
