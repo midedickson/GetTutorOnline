@@ -72,7 +72,7 @@ class TutorRequestCreate(generics.CreateAPIView):
     '''
 
 
-class TutorRequestDetail(generics.RetrieveUpdateDestroyAPIView):
+class TutorRequestDetail(generics.RetrieveDestroyAPIView):
     """
         Retrieve, update or delete a tutor request
     """

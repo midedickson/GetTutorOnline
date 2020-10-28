@@ -18,11 +18,13 @@ class ParentSerializer(serializers.ModelSerializer):
 
 
 class TutorRequestSerializer(serializers.ModelSerializer):
+    from parents.serializers import ParentSerializer
     requested_tutorplan = serializers.PrimaryKeyRelatedField(
         many=False, queryset=TutoringPlan.objects.all())
     subjects_requested = StringSerializer(many=True)
     requested_tutor = serializers.SerializerMethodField()
     amount_payable = serializers.SerializerMethodField()
+    requested_by = ParentSerializer(many=False, read_only=True)
 
     class Meta:
         model = TutorRequest
