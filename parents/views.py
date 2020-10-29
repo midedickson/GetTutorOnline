@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics, permissions
 from .models import *
 from .serializers import *
@@ -85,6 +85,29 @@ class ParentTutorRequestList(generics.ListAPIView):
         return queryset
 
 
+@api_view(["GET"])
+@permission_classes([IsRequester, ])
+def cancel_after24hrs(request, pk):
+    try:
+        request = get_object_or_404(TutorRequest, id=pk)
+        if request.DoesNotExist:
+            return Response({'message': 'This tutor request does not exist'}, status=404)
+        if request.isAccepted == True:
+            return Response({'message': 'The tutor has already accepted this request. Please Proceed to payment'}, status=400)
+        if request.isCancelled == False:
+            request.isCancelled = True
+            request.save()
+            return Response({'message': 'Request has been cancelled as the Tutor has not accepted after 24 hours'}, status=200)
+        if request.isCancelled == True:
+            return Response({'message': 'This tutor request has already been cancelled earlier'}, status=400)
+
+    except BaseException as e:
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        ex_traceback = traceback.extract_tb(ex_traceback)
+        print(ex_type)
+        print(ex_value)
+        print(ex_traceback)
+        return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
 # class SpecialRequestCreate(generics.CreateAPIView):
 #     """
 #         Create Special Request
