@@ -116,10 +116,94 @@ def cancel_after24hrs(request, pk):
             return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
 
 
+def subjects_to_json(subjects):
+    subject_list = []
+    for subject in subjects:
+        subject_list.append(subject.name)
+    return subject_list
+
+
+def tutor_request_to_json(tutor_request):
+    tutor = tutor_request.get_tutor
+    tutor_username = tutor.profile.user.username
+    tutor_name = tutor.profile.title + ' ' + \
+        tutor.profile.user.first_name + ' ' + tutor.profile.user.last_name
+    tutor_photo = tutor.profile.photo.url
+    desired_time = tutor_request.desired_time
+    hours = tutor_request.hour_per_day
+    days = tutor_request.days_per_week
+    duration = tutor_request.requested_duration
+    cost = tutor_request.get_total_price
+    location = tutor_request.location_needed
+
+    return {
+        'id': tutor_request.id,
+        'tutor': {
+            'username': tutor_username,
+            'photo': tutor_photo,
+            'name': tutor_name
+        },
+        'hours_per_day': hours,
+        'days in a week': days,
+        'duration': duration,
+        'cost': cost,
+        'location': location,
+        'expertise_requested': subjects_to_json(tutor_request.subjects_requested.all())
+
+    }
+
+
 @api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated, ])
 def get_tutor_request_list(request):
-    pass
+    try:
+        profile = request.user.parentprofile
+        waiting_for_acceptance = []
+        pending_payments = []
+        cancelled_requests = []
+        rejected = []
+        completed = []
+        inProgress = []
+
+        try:
+            tutor_requests = TutorRequest.objects.filter(requested_by=profile)
+            for tutor_request in tutor_requests:
+                if tutor_request.isCancelled:
+                    json = tutor_request_to_json(tutor_request)
+                    cancelled_requests.append(json)
+                elif tutor_request.isCompleted:
+                    json = tutor_request_to_json(tutor_request)
+                    completed.append(json)
+                elif tutor_request.isPaid and tutor_request.inProgress:
+                    json = tutor_request_to_json(tutor_request)
+                    inProgress.append(json)
+                elif tutor_request.isAccepted and not tutor_request.isPaid:
+                    json = tutor_request_to_json(tutor_request)
+                    pending_payments.append(json)
+                elif not tutor_request.isAccepted:
+                    json = tutor_request_to_json(tutor_request)
+                    waiting_for_acceptance.append(json)
+                else:
+                    continue
+        except TutorRequest.DoesNotExist:
+            return Response({'message': 'You have not sent any request to any tutor yet, What are you waiting for? Get A Tutor Now!'}, status=404)
+        return Response({
+            'waiting_for_acceptance': waiting_for_acceptance,
+            'pending_payments': pending_payments,
+            'cancelled_requests': cancelled_requests,
+            'rejected': rejected,
+            'completed': completed,
+            'inProgress': inProgress
+        }, status=200)
+
+    except BaseException as e:
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        ex_traceback = traceback.extract_tb(ex_traceback)
+        print(ex_type)
+        print(ex_value)
+        print(ex_traceback)
+        return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
+
 # class SpecialRequestCreate(generics.CreateAPIView):
 #     """
 #         Create Special Request

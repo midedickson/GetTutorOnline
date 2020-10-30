@@ -4,7 +4,8 @@ from .views import (
     TutorRequestCreate,
     TutorRequestDetail,
     ParentTutorRequestList,
-    cancel_after24hrs
+    cancel_after24hrs,
+    get_tutor_request_list
 )
 from django.urls.conf import path
 
@@ -18,5 +19,7 @@ urlpatterns = [
     path('tutor_requests/', ParentTutorRequestList.as_view(),
          name='parent_tutor_requests'),
     path('24_hours_cancel_request/<pk>/',
-         cancel_after24hrs, name='24_hours_cancel_request')
+         cancel_after24hrs, name='24_hours_cancel_request'),
+    path('get_tutor_request_list', get_tutor_request_list,
+         name='get_tutor_request_list')
 ]
