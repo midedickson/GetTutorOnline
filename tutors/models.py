@@ -76,6 +76,7 @@ class TutoringPlan(models.Model):
         Expertise, on_delete=models.SET_NULL, null=True, related_name='minor1')
     minor2 = models.ForeignKey(
         Expertise, on_delete=models.SET_NULL, null=True, related_name='minor2')
+    desired_time = models.TimeField(null=True, blank=True)
     medium = models.CharField(
         max_length=10, choices=MEDIUM_CHOICES, default='online')
     locations = models.CharField(

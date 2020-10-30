@@ -44,6 +44,7 @@ class TutorRequest(models.Model):
     days_per_week = models.PositiveIntegerField(verbose_name='Days Per Week')
     requested_duration = models.PositiveIntegerField(
         verbose_name='Weeks_Needed')
+    desired_time = models.TimeField()
     location_needed = models.CharField(
         max_length=200, verbose_name='Tutoring_Location')
     description = models.TextField(max_length=1000, blank=True, null=True)

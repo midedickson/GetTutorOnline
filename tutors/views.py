@@ -79,6 +79,7 @@ def tutor_filter(request):
     max_rate = request.GET.get('max_rate')
     expertise = request.GET.get('expertise')
     location = request.GET.get('location')
+    desired_time = request.GET.get('desired_time')
     grade = request.GET.get('grade')
 
     if is_valid_queryparam(min_rate):
@@ -92,12 +93,44 @@ def tutor_filter(request):
 
     if is_valid_queryparam(grade) and grade != 'Choose...':
         tutor_qs = tutor_qs.filter(tutorplan__expertise__grade=grade)
-
+    if is_valid_queryparam(desired_time) and desired_time != 'Choose...':
+        tutor_qs = tutor_qs.filter(tutorplan__desired_time=desired_time)
     if is_valid_queryparam(name_contains_query):
         tutor_qs = tutor_qs.filter(Q(profile__user__first_name__icontains=name_contains_query) | Q(
             profile__user__last_name__icontains=name_contains_query))
 
-    return tutor_qs
+    return tutor_qs.order_by('?')
+
+
+def tutorplan_filter(request):
+    tutorplan_qs = TutoringPlan.objects.all()
+    # Parameters to be sent to the backend
+    name_contains_query = request.GET.get('name_contains')
+    min_rate = request.GET.get('min_rate')
+    max_rate = request.GET.get('max_rate')
+    expertise = request.GET.get('expertise')
+    location = request.GET.get('location')
+    desired_time = request.GET.get('desired_time')
+    grade = request.GET.get('grade')
+
+    if is_valid_queryparam(min_rate):
+        tutorplan_qs = tutorplan_qs.filter(rate_per_hour__gte=min_rate)
+
+    if is_valid_queryparam(max_rate):
+        tutorplan_qs = tutorplan_qs.filter(rate_per_hour__lte=max_rate)
+
+    if is_valid_queryparam(expertise) and expertise != 'Choose...':
+        tutorplan_qs = tutorplan_qs.filter(expertise__name=expertise)
+
+    if is_valid_queryparam(grade) and grade != 'Choose...':
+        tutorplan_qs = tutorplan_qs.filter(expertise__grade=grade)
+    if is_valid_queryparam(desired_time) and desired_time != 'Choose...':
+        tutorplan_qs = tutorplan_qs.filter(desired_time=desired_time)
+    if is_valid_queryparam(name_contains_query):
+        tutorplan_qs = tutorplan_qs.filter(Q(tutor__profile__user__first_name__icontains=name_contains_query) | Q(
+            tutor__profile__user__last_name__icontains=name_contains_query))
+
+    return tutorplan_qs.order_by('?')
 
 
 class TutorList(generics.ListAPIView):
@@ -273,35 +306,6 @@ class TuTutorRequestList(generics.ListAPIView):
         permissions.IsAuthenticated
     ]
     serializer_class = TutorRequestSerializer
-
-
-def tutorplan_filter(request):
-    tutorplan_qs = TutoringPlan.objects.all()
-    # Parameters to be sent to the backend
-    name_contains_query = request.GET.get('name_contains')
-    min_rate = request.GET.get('min_rate')
-    max_rate = request.GET.get('max_rate')
-    expertise = request.GET.get('expertise')
-    location = request.GET.get('location')
-    grade = request.GET.get('grade')
-
-    if is_valid_queryparam(min_rate):
-        tutorplan_qs = tutorplan_qs.filter(rate_per_hour__gte=min_rate)
-
-    if is_valid_queryparam(max_rate):
-        tutorplan_qs = tutorplan_qs.filter(rate_per_hour__lte=max_rate)
-
-    if is_valid_queryparam(expertise) and expertise != 'Choose...':
-        tutorplan_qs = tutorplan_qs.filter(expertise__name=expertise)
-
-    if is_valid_queryparam(grade) and grade != 'Choose...':
-        tutorplan_qs = tutorplan_qs.filter(expertise__grade=grade)
-
-    if is_valid_queryparam(name_contains_query):
-        tutorplan_qs = tutorplan_qs.filter(Q(tutor__profile__user__first_name__icontains=name_contains_query) | Q(
-            tutor__profile__user__last_name__icontains=name_contains_query))
-
-    return tutorplan_qs.order_by('?')
 
 
 DEFAULT_PAGE = 1
