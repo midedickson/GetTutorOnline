@@ -114,6 +114,12 @@ def cancel_after24hrs(request, pk):
             print(ex_value)
             print(ex_traceback)
             return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
+
+
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated, ])
+def get_tutor_request_list(request):
+    pass
 # class SpecialRequestCreate(generics.CreateAPIView):
 #     """
 #         Create Special Request
