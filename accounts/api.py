@@ -32,7 +32,40 @@ class RegisterAPI(generics.GenericAPIView):
 '''
 
 
-@csrf_exempt
+def validate_signup(email, first_name, last_name, password, password2):
+    validation = {}
+    import re
+    # for custom mails use: '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$'
+    # function for validating an Email
+
+    def check_email(email):
+        regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+        if re.search(regex, email) is not None:
+            return True
+        else:
+            return False
+
+    def check_name(name):
+        if re.search("[a-zA-Z]", name) is not None:
+            return True
+        else:
+            return False
+    if not check_email(email):
+        validation['email'] = 'Please anter a valid Email address!'
+    if not check_name(first_name):
+        validation['first_name'] = 'Names must contain only alphabets!'
+    if not check_name(last_name):
+        validation['first_name'] = 'Names must contain only alphabets!'
+    if password == '':
+        validation['password'] = 'Please set a password!'
+    if password != password2:
+        validation['confirm_password'] = 'Passwords must match!'
+    if len(validation) != 0:
+        return validation
+    else:
+        return None
+
+
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def user_signup_view(request):
@@ -47,99 +80,44 @@ def user_signup_view(request):
         try:
             check_username = User.objects.get(username=username)
             if check_username:
-                return Response({'message': 'A user with that username already exists'}, status=400)
+                return Response({'message': 'A user with that username already exists. Your username can contain alphabets numbers and characters. Example: steveAde1'}, status=400)
         except User.DoesNotExist:
             pass
+        # validation
         try:
             check_email = User.objects.get(email=email)
-            # Python program to validate an Email
-            import re
-            regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-            # for custom mails use: '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$'
-            # function for validating an Email
-
-            def check(email):
-
-                # pass the regular expression
-                # and the string in search() method
-                if(re.search(regex, email)):
-                    return True
-
-                else:
-                    return False
-
-            # Driver Code
-            # Enter the email
-
-            if not check(email):
-                return Response({'message': 'Please Enter a valid email'}, status=400)
-
-            if check_email:
-                return Response({
-                    'message': 'It seems you have previuosly signed up on our Get Tutor. Login to continue or Check that you are using the correct email.'
-                }, status=400)
         except User.DoesNotExist:
-            pass
-        # elif check_email and not check_email.active:
-        #     # token_validity_check = check_email.token_time_stamp
-        #     # if generate_token.check_token(check_user, token_validity_check):
-        #     response = json.dumps(
-        #         [{'message': 'Email already registered. Please check your email for activation link'}])
-        #     return Response(response, content_type='text/json', status=400)
-        if password == password2:
-            user = User.objects.create_user(
-                username=username, email=email, password=password)
-            user.first_name = first_name
-            user.last_name = last_name
-            user.active = True
-            user.save()
-            ParentProfile.objects.create(user=user)
-            # response = json.dumps([{ 'message': 'Check your email for account activation link. It may take several minutes to arrive'}])
-            return Response({
-                'token': AuthToken.objects.create(user)[1],
-                'message': 'Sign up successful',
-            }, status=200)
-            # user.type = User.Types.CLARITYCOUNSELLOR
-            # user_token = generate_token.make_token(user)
-            # user.token_time_stamp = user_token
-            # try:
-            # email_subject = 'Activate your account'
-            # message = render_to_string('activateclarity.html', {
-            #     'user':first_name,
-            #     'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-            #     'token':user_token
-            # })
-
-            # # send emails using mailgun
-            # # requests.post(
-            # #     "https://api.mailgun.net/v3/yudimy.com/messages",
-            # #     auth=("api", "7a9aa2a6a626aa7adaab58f2688350e6-913a5827-460c3ac0"),
-            # #     data={"from": "Clarity By Yudimy <clarityadmin@yudimy.com>",
-            # #         "to": [email],
-            # #         "subject": email_subject,
-            # #         "text": message})
-
-            # # send emails using sendgrid
-            # send_mail(
-            #     email_subject,
-            #     message,
-            #     'clarityadmin@yudimy.com',
-            #     [email],
-            #     fail_silently=False,
-            # )
-            # user.save()
-
-            # except BaseException as e:
-            #     # ex_type, ex_value, ex_traceback = sys.exc_info()
-            #     # ex_traceback = traceback.extract_tb(ex_traceback)
-            #     # print(ex_type)
-            #     # print(ex_value)
-            #     # print(ex_traceback)
-            #     response = json.dumps([{'message': 'Error in signing up'}])
-            #     return Response(response, content_type='text/json', status=500)
+            # validate user Email
+            valid = validate_signup(
+                email, first_name, last_name, password, password2)
+            if valid is not None:
+                return Response(valid, status=400)
+            else:
+                pass
         else:
-            return Response({'message': 'Passwords must match'}, status=400)
-
+            return Response({
+                'message': 'It seems you have previuosly signed up on Get Tutor. Login to continue or Check that you are using the correct email.'
+            }, status=400)
+        user = User.objects.create_user(
+            username=username, email=email, password=password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.active = True
+        user.save()
+        ParentProfile.objects.create(user=user)
+        # response = json.dumps([{ 'message': 'Check your email for account activation link. It may take several minutes to arrive'}])
+        return Response({
+            'token': AuthToken.objects.create(user)[1],
+            'message': 'Sign up successful',
+        }, status=200)
+        # # send emails using sendgrid
+        # send_mail(
+        #     email_subject,
+        #     message,
+        #     'clarityadmin@yudimy.com',
+        #     [email],
+        #     fail_silently=False,
+        # )
     except BaseException as e:
         ex_type, ex_value, ex_traceback = sys.exc_info()
         ex_traceback = traceback.extract_tb(ex_traceback)
@@ -169,95 +147,31 @@ def tutor_signup_view(request):
             pass
         try:
             check_email = User.objects.get(email=email)
-            # Python program to validate an Email
-            import re
-            regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-            # for custom mails use: '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$'
-            # function for validating an Email
-
-            def check(email):
-
-                # pass the regular expression
-                # and the string in search() method
-                if(re.search(regex, email)):
-                    return True
-
-                else:
-                    return False
-
-            # Driver Code
-            # Enter the email
-
-            if not check(email):
-                return Response({'message': 'Please Enter a valid email'}, status=400)
-
-            if check_email:
-                return Response({
-                    'message': 'It seems you have previuosly signed up on our Get Tutor. Login to continue or Check that you are using the correct email.'
-                }, status=400)
         except User.DoesNotExist:
-            pass
-        # elif check_email and not check_email.active:
-        #     # token_validity_check = check_email.token_time_stamp
-        #     # if generate_token.check_token(check_user, token_validity_check):
-        #     response = json.dumps(
-        #         [{'message': 'Email already registered. Please check your email for activation link'}])
-        #     return Response(response, content_type='text/json', status=400)
-        if password == password2:
-            user = User.objects.create_user(
-                username=username, email=email, password=password)
-            user.first_name = first_name
-            user.last_name = last_name
-            user.active = True
-            user.save()
-            profile = ParentProfile.objects.create(user=user, is_tutor=True)
-            Tutor.objects.create(profile=profile)
-            # response = json.dumps([{ 'message': 'Check your email for account activation link. It may take several minutes to arrive'}])
-            return Response({
-                'token': AuthToken.objects.create(user)[1],
-                'message': 'Sign up successful! You can now procceed to your tutor application form. As a bonus, you also have access to a parent dashbaord, where you can hire other tutors too',
-            }, status=200)
-            # user.type = User.Types.CLARITYCOUNSELLOR
-            # user_token = generate_token.make_token(user)
-            # user.token_time_stamp = user_token
-            # try:
-            # email_subject = 'Activate your account'
-            # message = render_to_string('activateclarity.html', {
-            #     'user':first_name,
-            #     'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-            #     'token':user_token
-            # })
-
-            # # send emails using mailgun
-            # # requests.post(
-            # #     "https://api.mailgun.net/v3/yudimy.com/messages",
-            # #     auth=("api", "7a9aa2a6a626aa7adaab58f2688350e6-913a5827-460c3ac0"),
-            # #     data={"from": "Clarity By Yudimy <clarityadmin@yudimy.com>",
-            # #         "to": [email],
-            # #         "subject": email_subject,
-            # #         "text": message})
-
-            # # send emails using sendgrid
-            # send_mail(
-            #     email_subject,
-            #     message,
-            #     'clarityadmin@yudimy.com',
-            #     [email],
-            #     fail_silently=False,
-            # )
-            # user.save()
-
-            # except BaseException as e:
-            #     # ex_type, ex_value, ex_traceback = sys.exc_info()
-            #     # ex_traceback = traceback.extract_tb(ex_traceback)
-            #     # print(ex_type)
-            #     # print(ex_value)
-            #     # print(ex_traceback)
-            #     response = json.dumps([{'message': 'Error in signing up'}])
-            #     return Response(response, content_type='text/json', status=500)
+            # validate user Email
+            valid = validate_signup(
+                email, first_name, last_name, password, password2)
+            if valid is not None:
+                return Response(valid, status=400)
+            else:
+                pass
         else:
-            return Response({'message': 'Passwords must match'}, status=400)
-
+            return Response({
+                'message': 'It seems you have previuosly signed up on Get Tutor. Login to continue or Check that you are using the correct email.'
+            }, status=400)
+        user = User.objects.create_user(
+            username=username, email=email, password=password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.active = True
+        user.save()
+        profile = ParentProfile.objects.create(user=user, is_tutor=True)
+        Tutor.objects.create(profile=profile)
+        # response = json.dumps([{ 'message': 'Check your email for account activation link. It may take several minutes to arrive'}])
+        return Response({
+            'token': AuthToken.objects.create(user)[1],
+            'message': 'Sign up successful! You can now procceed to your tutor application form. As a bonus, you also have access to a parent dashbaord, where you can hire other tutors too',
+        }, status=200)
     except BaseException as e:
         ex_type, ex_value, ex_traceback = sys.exc_info()
         ex_traceback = traceback.extract_tb(ex_traceback)
@@ -276,8 +190,8 @@ def login_view(request):
     payload = json.loads(request.body)
     username = payload["username"]
     password = payload["password"]
-    if username is None or password is None:
-        return Response({'error': 'Please provide both email/username and password'},
+    if username is None or password is None or username == '' or password == '':
+        return Response({'message': 'Please provide both email/username and password'},
                         status=HTTP_400_BAD_REQUEST)
     user = authenticate(username=username, password=password)
     if not user:
