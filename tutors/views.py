@@ -26,7 +26,7 @@ import json
 import sys
 import traceback
 
-
+'''
 @api_view(["GET"])
 @permission_classes([IsRequestedTutor, ])
 def accept_tutor_request(request, pk):
@@ -66,6 +66,7 @@ def reject_tutor_request(request, pk):
         print(ex_traceback)
         return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
 
+'''
 
 def is_valid_queryparam(param):
     return param != '' and param is not None
@@ -99,7 +100,7 @@ def tutor_filter(request):
         tutor_qs = tutor_qs.filter(Q(profile__user__first_name__icontains=name_contains_query) | Q(
             profile__user__last_name__icontains=name_contains_query))
 
-    return tutor_qs.order_by('?')
+    return tutor_qs.filter(available=True)order_by('?')
 
 
 def tutorplan_filter(request):
@@ -130,7 +131,7 @@ def tutorplan_filter(request):
         tutorplan_qs = tutorplan_qs.filter(Q(tutor__profile__user__first_name__icontains=name_contains_query) | Q(
             tutor__profile__user__last_name__icontains=name_contains_query))
 
-    return tutorplan_qs.order_by('?')
+    return tutorplan_qs.filter(tutor__available=True).order_by('?')
 
 
 class TutorList(generics.ListAPIView):

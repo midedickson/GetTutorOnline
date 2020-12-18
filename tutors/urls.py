@@ -27,8 +27,6 @@ urlpatterns = [
     path('create_tutor_plan/', create_tutor_plan),
     path('tutor_request_list/', TuTutorRequestList.as_view(),
          name='tutor_request_for_tutoring plan'),
-    path('accept_tutor_request/<pk>/', accept_tutor_request),
-    path('reject_tutor_request/<pk>/', reject_tutor_request),
     path('expertise', ExpertiseListView.as_view(), name='expertise'),
     path('tutor_plan/', TutoringPlanDetailView.as_view(), name='tutor_plan'),
 ]

@@ -15,13 +15,11 @@ class Tutor(models.Model):
         ('DRIV', 'Drivers\' License'),
     )
     profile = models.OneToOneField(ParentProfile, on_delete=models.CASCADE)
-    gender = models.CharField(
-        max_length=1, choices=GENDER_CHOICES, null=True, blank=True, default='M')
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True, default='M')
     age = models.CharField(max_length=2, null=True, blank=True)
-    disabilities = models.CharField(
-        max_length=150, default='None', null=True, blank=True)
-    nce = models.CharField(max_length=100, null=True, default='None',
-                           blank=True, verbose_name='College of Education')
+    available = models.BooleanField(default=True)
+    disabilities = models.CharField(max_length=150, default='None', null=True, blank=True)
+    nce = models.CharField(max_length=100, null=True, default='None', blank=True, verbose_name='College of Education')
     bachelors = models.CharField(
         max_length=200, default='None', null=True, blank=True, verbose_name='Bachelors')
     post_grad = models.CharField(
@@ -69,7 +67,7 @@ class TutoringPlan(models.Model):
         ('physical', 'Physical Tutoring'),
         ('both', 'Online and Physical Tutoring'),
     )
-    tutor = models.OneToOneField(Tutor, on_delete=models.CASCADE)
+    tutor = models.ForeignKey(Tutor, on_delete=models.CASCADE)
     major = models.ForeignKey(
         Expertise, on_delete=models.SET_NULL, null=True, related_name='major')
     minor1 = models.ForeignKey(
