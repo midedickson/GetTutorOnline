@@ -100,7 +100,7 @@ def tutor_filter(request):
         tutor_qs = tutor_qs.filter(Q(profile__user__first_name__icontains=name_contains_query) | Q(
             profile__user__last_name__icontains=name_contains_query))
 
-    return tutor_qs.filter(available=True)order_by('?')
+    return tutor_qs.filter(available=True).order_by('?')
 
 
 def tutorplan_filter(request):
