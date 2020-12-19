@@ -79,6 +79,7 @@ class TutoringPlan(models.Model):
         max_length=10, choices=MEDIUM_CHOICES, default='online')
     locations = models.CharField(
         max_length=200, null=False, blank=False, default='Any Location...')
+    first_hour_free = models.BooleanField(default=True)
     rate_per_hour = models.PositiveIntegerField(null=True, blank=True)
     mon = models.BooleanField(default=False)
     tue = models.BooleanField(default=False)

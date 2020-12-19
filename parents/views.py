@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 import sys
 import traceback
 import os
+import json
 
 
 class ParentCreate(generics.CreateAPIView):
@@ -42,7 +43,7 @@ class ParentDetail(generics.RetrieveUpdateDestroyAPIView):
         profile = get_object_or_404(ParentProfile, user=self.request.user)
         return profile
 
-
+'''
 class TutorRequestCreate(generics.CreateAPIView):
     """
         Send Request to tutor
@@ -58,6 +59,89 @@ class TutorRequestCreate(generics.CreateAPIView):
     def perform_create(self, serializer):
         profile = ParentProfile.objects.get(user=self.request.user)
         serializer.save(requested_by=profile)
+'''
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def create_tutor_request(request):
+    try:
+        payload = json.loads(request.body)
+        hours = payload['hours'] # int
+        days = payload['days'] # int
+        mon = payload['mon'] # "true" string
+        tue = payload['tue'] # "true" string
+        wed = payload['wed'] # "true" string
+        thur = payload['thur'] # "true" string
+        fri = payload['fri'] # "true" string
+        sat = payload['sat'] # "true" string
+        sun = payload['sun'] # "true" string
+        duration = payload['duration'] #int
+        medium = payload['medium'] # "physical", "virtual", or "both" string
+        location = payload['location'] # string
+        description = payload['description'] # string
+        tutor_plan_id = payload['tutor_plan_id'] # int
+        start_date = payload['start_date']
+        user = request.user
+
+        # get tutor plan
+        tutor_plan = TutoringPlan.objects.get(id=tutor_plan_id)
+        
+        # get parent profile
+        parent_profile = ParentProfile.objects.get(user=user)
+
+        # get start date
+        from datetime import datetime, timedelta
+        start_date = datetime.strptime(start_date, "%d/%m/%Y")
+        end_date = start_date += timedelta(weeks=duration)
+
+        preferred_days_string = ''
+        if mon == "true":
+            preferred_days_string += ', Monday'
+        
+        if tue == "true":
+            preferred_days_string += ', Tuesday'
+
+        if wed == "true":
+            preferred_days_string += ', Wednesday'
+        
+        if thur == "true":
+            preferred_days_string += ', Thursday'
+        
+        if fri == "true":
+            preferred_days_string += ', Friday'
+        
+        if sat == "true":
+            preferred_days_string += ', Saturday'
+        
+        if sun == "true":
+            preferred_days_string += ', Sunday'
+        
+        if preferred_days_string != '':
+            preferred_days_string = preferred_days_string[2:]
+        elif preferred_days_string == '':
+            preferred_days_string = 'Any Days'
+
+        # send email to parents and user
+        tutor_request = TutorRequest.objects.create(
+            requested_tutorplan=tutor_plan,
+            requested_by=parent_profile,
+            hour_per_day=hours,
+            days_per_week=days,
+            requested_duration=duration,
+            location_needed=location,
+            preferred_days=preferred_days_string,
+            medium=medium,
+            start_date=start_date,
+            end_date=end_date
+
+        )
+        return Response({'message': 'You have successfully booked a tutor!'}, status=200)
+    except BaseException as e:
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        ex_traceback = traceback.extract_tb(ex_traceback)
+        print(ex_type)
+        print(ex_value)
+        print(ex_traceback)
+        return Response({'message': 'It\'s not you, it\'s us. Please try again.'}, status=500)
 
 
 class TutorRequestDetail(generics.RetrieveDestroyAPIView):

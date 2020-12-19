@@ -35,7 +35,6 @@ class TutorRequest(models.Model):
     )
     requested_tutorplan = models.OneToOneField(
         'tutors.TutoringPlan', on_delete=models.CASCADE, related_name='tutor_request')
-    subjects_requested = models.ManyToManyField('tutors.Expertise')
     medium = models.CharField(
         max_length=10, choices=MEDIUM_CHOICES, default='online')
     requested_by = models.ForeignKey(
@@ -44,21 +43,20 @@ class TutorRequest(models.Model):
     days_per_week = models.PositiveIntegerField(verbose_name='Days Per Week')
     requested_duration = models.PositiveIntegerField(
         verbose_name='Weeks_Needed')
-    desired_time = models.TimeField()
+    start_date = models.DateField()
+    end_date = models.DateField()
     location_needed = models.CharField(
         max_length=200, verbose_name='Tutoring_Location')
     description = models.TextField(max_length=1000, blank=True, null=True)
+    preferred_days = models.CharField(max_length=250, blank=True, null=True)
     purpose_of_dispute = models.TextField(
         max_length=1000, blank=True, null=True)
-    purpose_of_rejection = models.TextField(
-        max_length=1000, blank=True, null=True)
-    isAccepted = models.BooleanField(default=False)
-    isRejected = models.BooleanField(default=False)
-    inProgress = models.BooleanField(default=False)
     isCompleted = models.BooleanField(default=False)
     isCancelled = models.BooleanField(default=False)
     isPaid = models.BooleanField(default=False)
     inDispute = models.BooleanField(default=False)
+    isRated = models.BooleanField(default=False)
+    rating = models.PositiveIntegerField(default=0)
 
     @property
     def get_total_price(self):
