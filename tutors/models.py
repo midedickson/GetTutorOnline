@@ -80,6 +80,20 @@ class TutoringPlan(models.Model):
     locations = models.CharField(
         max_length=200, null=False, blank=False, default='Any Location...')
     rate_per_hour = models.PositiveIntegerField(null=True, blank=True)
+    mon = models.BooleanField(default=False)
+    tue = models.BooleanField(default=False)
+    wed = models.BooleanField(default=False)
+    thur = models.BooleanField(default=False)
+    fri = models.BooleanField(default=False)
+    sat = models.BooleanField(default=False)
+    sun = models.BooleanField(default=False)
+    mon_time = models.TimeField()
+    tue_time = models.TimeField()
+    wed_time = models.TimeField()
+    thur_time = models.TimeField()
+    fri_time = models.TimeField()
+    sat_time = models.TimeField()
+    sun_time = models.TimeField()
 
     def __str__(self):
         tutor = self.tutor.profile
