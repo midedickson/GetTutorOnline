@@ -1,7 +1,7 @@
 from .views import (
     ParentCreate,
     ParentDetail,
-    TutorRequestCreate,
+    create_tutor_request,
     TutorRequestDetail,
     ParentTutorRequestList,
     cancel_after24hrs,
@@ -12,7 +12,7 @@ from django.urls.conf import path
 urlpatterns = [
     path('add/', ParentCreate.as_view(), name='add_parent'),
     path('get/', ParentDetail.as_view(), name='get_parent'),
-    path('create_tutor_request/', TutorRequestCreate.as_view(),
+    path('create_tutor_request/', create_tutor_request,
          name='create_tutor_request'),
     path('tutor_request/<pk>/', TutorRequestDetail.as_view(),
          name='get_tutor_request'),
