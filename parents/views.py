@@ -79,7 +79,7 @@ def create_tutor_request(request):
         location = payload['location'] # string
         description = payload['description'] # string
         tutor_plan_id = payload['tutor_plan_id'] # int
-        start_date = payload['start_date']
+        start_date = payload['start_date'] #dd/mm/yyyy
         user = request.user
 
         # get tutor plan
@@ -91,7 +91,7 @@ def create_tutor_request(request):
         # get start date
         from datetime import datetime, timedelta
         start_date = datetime.strptime(start_date, "%d/%m/%Y")
-        end_date = start_date += timedelta(weeks=duration)
+        end_date = start_date + timedelta(weeks=duration)
 
         preferred_days_string = ''
         if mon == "true":
@@ -131,10 +131,12 @@ def create_tutor_request(request):
             preferred_days=preferred_days_string,
             medium=medium,
             start_date=start_date,
-            end_date=end_date
+            end_date=end_date,
+            description=description
 
         )
-        return Response({'message': 'You have successfully booked a tutor!'}, status=200)
+        data = TutorRequestSerializer(tutor_request, many=False).data
+        return Response({'message': 'You have successfully booked a tutor!', 'data': data}, status=201)
     except BaseException as e:
         ex_type, ex_value, ex_traceback = sys.exc_info()
         ex_traceback = traceback.extract_tb(ex_traceback)

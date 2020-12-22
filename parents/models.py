@@ -33,7 +33,7 @@ class TutorRequest(models.Model):
         ('physical', 'Physical Tutoring'),
         ('both', 'Both'),
     )
-    requested_tutorplan = models.OneToOneField(
+    requested_tutorplan = models.ForeignKey(
         'tutors.TutoringPlan', on_delete=models.CASCADE, related_name='tutor_request')
     medium = models.CharField(
         max_length=10, choices=MEDIUM_CHOICES, default='online')
@@ -43,8 +43,8 @@ class TutorRequest(models.Model):
     days_per_week = models.PositiveIntegerField(verbose_name='Days Per Week')
     requested_duration = models.PositiveIntegerField(
         verbose_name='Weeks_Needed')
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
     location_needed = models.CharField(
         max_length=200, verbose_name='Tutoring_Location')
     description = models.TextField(max_length=1000, blank=True, null=True)

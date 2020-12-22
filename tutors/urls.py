@@ -10,9 +10,7 @@ from .views import (
     CreateTutorPLan,
     TutorsTutorPlanList,
     TutorProfile,
-    create_tutor_plan,
-    accept_tutor_request,
-    reject_tutor_request
+    create_tutor_plan
 )
 
 from parents.views import (ParentDetail)

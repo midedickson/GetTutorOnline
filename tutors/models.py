@@ -88,13 +88,13 @@ class TutoringPlan(models.Model):
     fri = models.BooleanField(default=False)
     sat = models.BooleanField(default=False)
     sun = models.BooleanField(default=False)
-    mon_time = models.TimeField()
-    tue_time = models.TimeField()
-    wed_time = models.TimeField()
-    thur_time = models.TimeField()
-    fri_time = models.TimeField()
-    sat_time = models.TimeField()
-    sun_time = models.TimeField()
+    mon_time = models.TimeField(null=True, blank=True)
+    tue_time = models.TimeField(null=True, blank=True)
+    wed_time = models.TimeField(null=True, blank=True)
+    thur_time = models.TimeField(null=True, blank=True)
+    fri_time = models.TimeField(null=True, blank=True)
+    sat_time = models.TimeField(null=True, blank=True)
+    sun_time = models.TimeField(null=True, blank=True)
 
     def __str__(self):
         tutor = self.tutor.profile
