@@ -142,7 +142,7 @@ def tutor_filter(request):
             tutor_qs = tutor_qs.filter(tutorplan__sun=True)
 
     if is_valid_queryparam(mon_time):
-        time = datetime.strptime(mon_time, '%H:%M')
+        time = datetime.strptime(mon_time, '%I:%M %p')
         tutor_qs = tutor_qs.filter(tutor)
 
     return tutor_qs.filter(available=True).order_by('?')
@@ -165,13 +165,13 @@ def tutorplan_filter(request):
     fri = request.GET.get('fri')
     sat = request.GET.get('sat')
     sun = request.GET.get('sun')
-    mon_time = request.GET.get('mon_time')
-    tue_time = request.GET.get('tue_time')
-    wed_time = request.GET.get('wed_time')
-    thur_time = request.GET.get('thur_time')
-    fri_time = request.GET.get('fri_time')
-    sat_time = request.GET.get('sat_time')
-    sun_time = request.GET.get('sun_time')
+    mon_time = request.GET.get('mon_time') #12-hour time format: 09:30 PM
+    tue_time = request.GET.get('tue_time') #12-hour time format: 09:30 PM
+    wed_time = request.GET.get('wed_time') #12-hour time format: 09:30 PM
+    thur_time = request.GET.get('thur_time') #12-hour time format: 09:30 PM
+    fri_time = request.GET.get('fri_time') #12-hour time format: 09:30 PM
+    sat_time = request.GET.get('sat_time') #12-hour time format: 09:30 PM
+    sun_time = request.GET.get('sun_time') #12-hour time format: 09:30 PM
 
     if is_valid_queryparam(min_rate):
         tutorplan_qs = tutorplan_qs.filter(rate_per_hour__gte=min_rate)
@@ -217,31 +217,31 @@ def tutorplan_filter(request):
             tutorplan_qs = tutorplan_qs.filter(sun=True)
 
     if is_valid_queryparam(mon_time):
-        time = datetime.strptime(mon_time, '%H:%M')
+        time = datetime.strptime(mon_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(mon_time=time)
     
     if is_valid_queryparam(tue_time):
-        time = datetime.strptime(tue_time, '%H:%M')
+        time = datetime.strptime(tue_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(tue_time=time)
     
     if is_valid_queryparam(wed_time):
-        time = datetime.strptime(wed_time, '%H:%M')
+        time = datetime.strptime(wed_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(wed_time=time)
     
     if is_valid_queryparam(thur_time):
-        time = datetime.strptime(thur_time, '%H:%M')
+        time = datetime.strptime(thur_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(thur_time=time)
     
     if is_valid_queryparam(fri_time):
-        time = datetime.strptime(fri_time, '%H:%M')
+        time = datetime.strptime(fri_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(fri_time=time)
     
     if is_valid_queryparam(sat_time):
-        time = datetime.strptime(sat_time, '%H:%M')
+        time = datetime.strptime(sat_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(sat_time=time)
     
     if is_valid_queryparam(sun_time):
-        time = datetime.strptime(sun_time, '%H:%M')
+        time = datetime.strptime(sun_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(sun_time=time)
 
     return tutorplan_qs.filter(tutor__available=True).order_by('?')
