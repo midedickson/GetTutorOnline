@@ -15,7 +15,7 @@ from .views import (
 
 from parents.views import (ParentDetail)
 urlpatterns = [
-    path('general_tutoring_plan_list/', GeneralTutoringPlanList.as_view(),
+    path('general-tutoring-plan-list/', GeneralTutoringPlanList.as_view(),
          name='tutoring_plan_list'),
     path('tutor_tutoring_plan_list', TutorsTutorPlanList.as_view()),
     path('tutor_list', TutorList.as_view(), name='tutor_list'),
