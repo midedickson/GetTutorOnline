@@ -89,7 +89,9 @@ DATABASES = {
 
 # Rest Framework Setting.
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'knox.auth.TokenAuthentication',
+    ]
 }
 
 AUTHENTICATION_BACKENDS = [

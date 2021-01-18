@@ -185,7 +185,6 @@ def tutor_signup_view(request):
 
 
 @api_view(["POST"])
-@permission_classes((AllowAny, ))
 def login_view(request):
     payload = json.loads(request.body)
     username = payload["username"]
