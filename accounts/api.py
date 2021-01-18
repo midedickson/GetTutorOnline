@@ -127,7 +127,7 @@ def user_signup_view(request):
         return Response({'message': 'Something went wrong. Please try again.'}, status=500)
 
 
-@csrf_exempt
+
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def tutor_signup_view(request):
@@ -183,9 +183,9 @@ def tutor_signup_view(request):
 # Login API
 
 
-@csrf_exempt
+
 @api_view(["POST"])
-@permission_classes((AllowAny,))
+@permission_classes((AllowAny, ))
 def login_view(request):
     payload = json.loads(request.body)
     username = payload["username"]
