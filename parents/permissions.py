@@ -28,4 +28,4 @@ class IsRequester(permissions.BasePermission):
 
 class SkipAuth(permissions.IsAuthenticated):
     def has_permission(self, request, view):
-        return True
+        return False
