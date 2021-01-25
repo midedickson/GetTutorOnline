@@ -24,3 +24,8 @@ class IsRequester(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return obj.requested_by.user == request.user
+
+
+class SkipAuth(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        return True

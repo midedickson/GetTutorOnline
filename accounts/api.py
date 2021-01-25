@@ -14,7 +14,7 @@ from parents.models import ParentProfile
 from tutors.models import Tutor
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from parents.permissions import SkipAuth
 # Register API
 
 '''
@@ -185,6 +185,7 @@ def tutor_signup_view(request):
 
 
 @api_view(["POST"])
+@permission_classes([SkipAuth])
 def login_view(request):
     payload = json.loads(request.body)
     username = payload["username"]
