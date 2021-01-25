@@ -190,8 +190,7 @@ def login_view(request):
     username = payload["username"]
     password = payload["password"]
     if username is None or password is None or username == '' or password == '':
-        return Response({'message': 'Please provide both email/username and password'},
-                        status=HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Please provide both email/username and password'}, status=400)
     user = authenticate(username=username, password=password)
     if not user:
         return Response({'message': 'Have you signed up with us? Try the sign up option or check that you are using the correct login details.'}, status=400)
