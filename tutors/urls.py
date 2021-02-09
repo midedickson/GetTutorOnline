@@ -26,5 +26,5 @@ urlpatterns = [
     path('tutor_request_list/', TuTutorRequestList.as_view(),
          name='tutor_request_for_tutoring plan'),
     path('expertise', ExpertiseListView.as_view(), name='expertise'),
-    path('tutor_plan/', TutoringPlanDetailView.as_view(), name='tutor_plan'),
+    path('tutor-plan/', TutoringPlanDetailView.as_view(), name='tutor_plan'),
 ]

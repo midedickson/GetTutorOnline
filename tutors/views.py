@@ -374,7 +374,7 @@ class CreateTutorPLan(generics.CreateAPIView):
         serializer.save(tutor=profile.tutor)
 
 
-class TutoringPlanDetailView(generics.RetrieveUpdateDestroyAPIView):
+class TutoringPlanDetailView(generics.RetrieveAPIView):
     permission_classes = [
         permissions.AllowAny,
     ]
