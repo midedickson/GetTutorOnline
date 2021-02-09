@@ -11,10 +11,17 @@ class StringSerializer(serializers.StringRelatedField):
 
 class ParentSerializer(serializers.ModelSerializer):
     user = UserSerilizer(many=False, read_only=True)
+    photo = serializers.SerializerMethodField()
 
     class Meta:
         model = ParentProfile
         fields = '__all__'
+
+    def get_photo(self, obj):
+        if obj.photo:
+            return obj.photo.url
+        else:
+            return ""
 
 
 class TutorRequestSerializer(serializers.ModelSerializer):
