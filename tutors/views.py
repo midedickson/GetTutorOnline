@@ -145,7 +145,7 @@ def tutor_filter(request):
         time = datetime.strptime(mon_time, '%I:%M %p')
         tutor_qs = tutor_qs.filter(tutor)
 
-    return tutor_qs.filter(available=True).order_by('?')
+    return tutor_qs.filter(available=True)
 
 
 def tutorplan_filter(request):
@@ -244,7 +244,7 @@ def tutorplan_filter(request):
         time = datetime.strptime(sun_time, '%I:%M %p')
         tutorplan_qs = tutorplan_qs.filter(sun_time=time)
 
-    return tutorplan_qs.filter(tutor__available=True).order_by('?')
+    return tutorplan_qs.filter(tutor__available=True)
 
 
 class TutorList(generics.ListAPIView):

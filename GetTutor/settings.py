@@ -142,4 +142,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+MEDIA_URL = '/media/'
+# MEDIA_URL = BASE_URL + MEDIA_URL_REL
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
 CORS_ORIGIN_ALLOW_ALL = True
