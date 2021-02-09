@@ -26,7 +26,7 @@ class ExpertiseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Expertise
-        fields = '__all__'
+        fields = ('display_name')
 
     def get_display_name(self, obj):
         return obj.__str__()
