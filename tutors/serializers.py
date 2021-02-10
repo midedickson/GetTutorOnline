@@ -48,7 +48,7 @@ class TutoringPlanSerializer(serializers.ModelSerializer):
     def get_minor1_expertise(self, obj):
         return ExpertiseSerializer(obj.minor1, many=False).data
 
-        return obj.major1
+        return obj.
 
     def get_minor2_expertise(self, obj):
         return ExpertiseSerializer(obj.minor2, many=False).data
