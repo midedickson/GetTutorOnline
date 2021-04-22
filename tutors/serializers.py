@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import (
     Tutor,
     TutoringPlan,
-    Expertise
+    Expertise,
+    FAQ
 )
 # from parents.serializers import ParentSerializer
 from parents.serializers import ParentSerializer
@@ -31,12 +32,17 @@ class ExpertiseSerializer(serializers.ModelSerializer):
     def get_display_name(self, obj):
         return obj.__str__()
 
+class FAQserializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = '__all__'
 
 class TutoringPlanSerializer(serializers.ModelSerializer):
     tutor = TutorSerializer(many=False, read_only=True)
     major_expertise = serializers.SerializerMethodField(read_only=True)
     minor1_expertise = serializers.SerializerMethodField(read_only=True)
     minor2_expertise = serializers.SerializerMethodField(read_only=True)
+    faq = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = TutoringPlan
@@ -51,3 +57,8 @@ class TutoringPlanSerializer(serializers.ModelSerializer):
 
     def get_minor2_expertise(self, obj):
         return ExpertiseSerializer(obj.minor2, many=False).data
+    
+    def get_faq(self, obj):
+        tutor = obj.tutor
+        faqs = FAQ.objects.filter(tutor=tutor)
+        return FAQserializer(faqs, many=True).data

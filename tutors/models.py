@@ -98,3 +98,9 @@ class TutoringPlan(models.Model):
     def __str__(self):
         tutor = self.tutor.profile
         return f"{tutor.title} {tutor.user.first_name} {tutor.user.last_name}'s Tutoring Plan"
+
+
+class FAQ(models.Model):
+    tutor = models.ForeignKey(Tutor, on_delete=models.CASCADE)
+    question = models.TextField()
+    answer = models.TextField()
