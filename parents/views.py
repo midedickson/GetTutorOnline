@@ -251,8 +251,8 @@ def get_tutor_request_list(request):
         completed = []
         inProgress = []
 
-        try:
-            tutor_requests = TutorRequest.objects.filter(requested_by=profile)
+        tutor_requests = TutorRequest.objects.filter(requested_by=profile)
+        if tutor_requests.exists():
             for tutor_request in tutor_requests:
                 if tutor_request.isCancelled:
                     json = tutor_request_to_json(tutor_request)
@@ -271,7 +271,7 @@ def get_tutor_request_list(request):
                     waiting_for_acceptance.append(json)
                 else:
                     continue
-        except TutorRequest.DoesNotExist:
+        else:
             return Response({'message': 'You have not sent any request to any tutor yet, What are you waiting for? Get A Tutor Now!'}, status=404)
         return Response({
             'waiting_for_acceptance': waiting_for_acceptance,
