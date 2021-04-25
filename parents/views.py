@@ -133,7 +133,6 @@ def create_tutor_request(request):
             start_date=start_date,
             end_date=end_date,
             description=description
-
         )
         data = TutorRequestSerializer(tutor_request, many=False).data
         return Response({'message': 'You have successfully booked a tutor!', 'data': data}, status=201)
